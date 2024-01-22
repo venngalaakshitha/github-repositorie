@@ -1,0 +1,219 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #profile img {
+            border-radius: 50%;
+            margin-right: 20px;
+            width: 100px;
+            height: 100px;
+        }
+
+        #user-details {
+            max-width: 300px;
+            text-align: center;
+        }
+
+        #repositories {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .repository {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px;
+            width: 200px;
+        }
+
+        #pagination {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .page-number {
+            margin: 0 5px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .page-number.active {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        #older, #next {
+            margin: 0 10px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        #older:hover, #next:hover {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        #older:disabled, #next:disabled {
+            background-color: #ddd;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+
+        #search-bar {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 300px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="profile">
+        <img src="https://placekitten.com/100/100" alt="Profile Photo">
+        <div id="user-details">
+            <h2>VengalaAkshitha</h2>
+            <p>WebDeveloper</p>
+            <!-- Add more details as needed -->
+        </div>
+    </div>
+    
+   
+    <input type="text" id="search-bar" placeholder="Search repositories..." oninput="filterRepositories()">
+
+    <div id="repositories"></div>
+
+    <div id="pagination"></div>
+
+    <script>
+        // Sample data for repositories
+        const repositoriesData = Array.from({ length: 100 }, (_, index) => ({ name: `Repo ${index + 1}`, description: `Description ${index + 1}` }));
+
+        const repositoriesContainer = document.getElementById("repositories");
+        const paginationContainer = document.getElementById("pagination");
+        const searchBar = document.getElementById("search-bar");
+        const itemsPerPage = 10;
+        let currentPage = 1;
+
+        function displayRepositories() {
+            repositoriesContainer.innerHTML = '';
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const currentRepositories = repositoriesData.slice(startIndex, endIndex);
+
+            currentRepositories.forEach(repo => {
+                const repoElement = document.createElement("div");
+                repoElement.className = "repository";
+                repoElement.innerHTML = `
+                    <h3>${repo.name}</h3>
+                    <p>${repo.description || "No description available"}</p>
+                    <!-- Add more details if needed -->
+                `;
+                repositoriesContainer.appendChild(repoElement);
+            });
+        }
+
+        function displayPagination() {
+            paginationContainer.innerHTML = '';
+
+            const totalPages = Math.ceil(repositoriesData.length / itemsPerPage);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement("span");
+                pageButton.className = "page-number";
+                pageButton.textContent = i;
+                pageButton.onclick = () => goToPage(i);
+                if (i === currentPage) {
+                    pageButton.classList.add("active");
+                }
+                paginationContainer.appendChild(pageButton);
+            }
+
+            const olderButton = document.createElement("span");
+            olderButton.id = "older";
+            olderButton.textContent = "Older";
+            olderButton.onclick = goToPreviousPage;
+            olderButton.disabled = currentPage === 1;
+            paginationContainer.appendChild(olderButton);
+
+            const nextButton = document.createElement("span");
+            nextButton.id = "next";
+            nextButton.textContent = "Next";
+            nextButton.onclick = goToNextPage;
+            nextButton.disabled = currentPage === totalPages;
+            paginationContainer.appendChild(nextButton);
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            displayRepositories();
+            displayPagination();
+        }
+
+        function goToPreviousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayRepositories();
+                displayPagination();
+            }
+        }
+
+        function goToNextPage() {
+            const totalPages = Math.ceil(repositoriesData.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayRepositories();
+                displayPagination();
+            }
+        }
+
+        function filterRepositories() {
+            const searchTerm = searchBar.value.toLowerCase();
+            const filteredRepositories = repositoriesData.filter(repo => repo.name.toLowerCase().includes(searchTerm));
+            repositoriesContainer.innerHTML = '';
+
+            filteredRepositories.forEach(repo => {
+                const repoElement = document.createElement("div");
+                repoElement.className = "repository";
+                repoElement.innerHTML = `
+                    <h3>${repo.name}</h3>
+                    <p>${repo.description || "No description available"}</p>
+                    <!-- Add more details if needed -->
+                `;
+                repositoriesContainer.appendChild(repoElement);
+            });
+        }
+
+        // Initial display
+        displayRepositories();
+        displayPagination();
+    </script>
+
+</body>
+</html>
+
